@@ -1,6 +1,7 @@
 package com.example.app_test_2;
 
 import Jama.Matrix;
+
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -74,75 +75,76 @@ public class MainActivity extends AppCompatActivity {
         tv1 = findViewById(R.id.textView);
 
         btn_1.setOnClickListener(v -> {
-            File output = new File(getExternalCacheDir(),"output_image.jpg");
+            File output = new File(getExternalCacheDir(), "output_image.jpg");
             try {
-                if (output.exists()){
+                if (output.exists()) {
                     output.delete();
                 }
                 output.createNewFile();
-            }catch (IOException e){
+            } catch (IOException e) {
                 e.printStackTrace();
             }
-            if (Build.VERSION.SDK_INT >= 24){
-            //图片的保存路径
-                imageUri= FileProvider.getUriForFile(MainActivity.this,"com.example.takephoto.fileprovider",output);
+            if (Build.VERSION.SDK_INT >= 24) {
+                //图片的保存路径
+                imageUri = FileProvider.getUriForFile(MainActivity.this, "com.example.takephoto.fileprovider", output);
+            } else {
+                imageUri = Uri.fromFile(output);
             }
-            else {imageUri=Uri.fromFile(output);}
             //跳转界面到系统自带的拍照界面
-            Intent intent=new Intent("android.media.action.IMAGE_CAPTURE");
+            Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
 
-            intent.putExtra(MediaStore.EXTRA_OUTPUT,imageUri);
-            startActivityForResult(intent,TAKE_PHOTO);
+            intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
+            startActivityForResult(intent, TAKE_PHOTO);
 
         });
         example_mat = new Mat();
         try {
-            example_mat = Utils.loadResource(this, R.drawable.pic1); // new_2
-            template_mat = Utils.loadResource(this, R.drawable.pic1); // new_1
+            example_mat = Utils.loadResource(this, R.drawable.new_2);
+            template_mat = Utils.loadResource(this, R.drawable.new_1);
         } catch (IOException e) {
             e.printStackTrace();
         }
-        bt2.setOnClickListener(v ->{
+        bt2.setOnClickListener(v -> {
             resultBitmap = Bitmap.createBitmap(example_mat.width(), example_mat.height(), Bitmap.Config.ARGB_8888);
             Imgproc.cvtColor(example_mat, example_mat, Imgproc.COLOR_BGR2RGB);
             Utils.matToBitmap(example_mat, resultBitmap);
             iv1.setImageBitmap(resultBitmap);
         });
-        bt1.setOnClickListener(v ->{
-            template_matrix = deal_pic_template(template_mat);
-            example_matrix = deal_pic_example(example_mat);
-            matrix_op(template_matrix, example_matrix);
+        bt1.setOnClickListener(v -> {
+            // template_matrix = deal_pic_template(template_mat);
+            // example_matrix = deal_pic_example(example_mat);
+            // matrix_op(template_matrix, example_matrix);
             temp_test(template_mat);
         });
-        bt3.setOnClickListener(v ->{
-            tv1.setTextSize(30);
+        bt3.setOnClickListener(v -> {
             tv1.setText("64.4 ppm");
         });
     }
 
-    protected  void onActivityResult(int requestCode,int resultCode,Intent data) {
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        switch (requestCode){
+        switch (requestCode) {
             case TAKE_PHOTO:
-                if (resultCode==RESULT_OK){
+                if (resultCode == RESULT_OK) {
                     // 使用try让程序运行在内报错
                     try {
                         //将图片保存
                         resultBitmap = BitmapFactory.decodeStream(getContentResolver().openInputStream(imageUri));
                         iv_photo.setImageBitmap(resultBitmap);
                         Utils.bitmapToMat(resultBitmap, template_mat);
-                    }catch (FileNotFoundException e){
+                    } catch (FileNotFoundException e) {
                         e.printStackTrace();
                     }
                 }
                 break;
-            default:break;
+            default:
+                break;
         }
     }
 
     private void iniLoadOpenCV() {
         boolean success = OpenCVLoader.initDebug();
-        if(success) {
+        if (success) {
             Toast.makeText(this.getApplicationContext(), "Loading OpenCV Libraries...", Toast.LENGTH_LONG).show();
         } else {
             Toast.makeText(this.getApplicationContext(), "WARNING: Could not load OpenCV Libraries!", Toast.LENGTH_LONG).show();
@@ -155,7 +157,6 @@ public class MainActivity extends AppCompatActivity {
         iv1.setImageBitmap(resultBitmap);
     }
 
-    // deal with template picture
     public double[][] deal_pic_template(@NonNull Mat mat) {
         Mat new_mat = new Mat();
         Mat gray = new Mat();
@@ -287,7 +288,7 @@ public class MainActivity extends AppCompatActivity {
         for (int con = 0; con < 5; con++) {
             for (int qwe = 0; qwe < 5 - con - 1; qwe++) {
                 if (group1[qwe][0] > group1[qwe + 1][0]) {
-                    double[] temp1 = new double[3];
+                    double[] temp1;
                     temp1 = group1[qwe + 1];
                     group1[qwe + 1] = group1[qwe];
                     group1[qwe] = temp1;
@@ -297,7 +298,7 @@ public class MainActivity extends AppCompatActivity {
         for (int con = 0; con < 5; con++) {
             for (int qwe = 0; qwe < 5 - con - 1; qwe++) {
                 if (group2[qwe][0] > group2[qwe + 1][0]) {
-                    double[] temp2 = new double[3];
+                    double[] temp2;
                     temp2 = group2[qwe + 1];
                     group2[qwe + 1] = group2[qwe];
                     group2[qwe] = temp2;
@@ -307,7 +308,7 @@ public class MainActivity extends AppCompatActivity {
         for (int con = 0; con < 4; con++) {
             for (int qwe = 0; qwe < 4 - con - 1; qwe++) {
                 if (group3[qwe][0] > group3[qwe + 1][0]) {
-                    double[] temp3 = new double[3];
+                    double[] temp3;
                     temp3 = group3[qwe + 1];
                     group3[qwe + 1] = group3[qwe];
                     group3[qwe] = temp3;
@@ -317,7 +318,7 @@ public class MainActivity extends AppCompatActivity {
         for (int con = 0; con < 5; con++) {
             for (int qwe = 0; qwe < 5 - con - 1; qwe++) {
                 if (group4[qwe][0] > group4[qwe + 1][0]) {
-                    double[] temp4 = new double[3];
+                    double[] temp4;
                     temp4 = group4[qwe + 1];
                     group4[qwe + 1] = group4[qwe];
                     group4[qwe] = temp4;
@@ -327,7 +328,7 @@ public class MainActivity extends AppCompatActivity {
         for (int con = 0; con < 5; con++) {
             for (int qwe = 0; qwe < 5 - con - 1; qwe++) {
                 if (group5[qwe][0] > group5[qwe + 1][0]) {
-                    double[] temp5 = new double[3];
+                    double[] temp5;
                     temp5 = group5[qwe + 1];
                     group5[qwe + 1] = group5[qwe];
                     group5[qwe] = temp5;
@@ -418,7 +419,7 @@ public class MainActivity extends AppCompatActivity {
         for (int con = 0; con < 24; con++) {
             for (int qwe = 0; qwe < 24 - con - 1; qwe++) {
                 if (info[qwe][1] > info[qwe + 1][1]) {
-                    float[] temp = new float[3];
+                    float[] temp;
                     temp = info[qwe + 1];
                     info[qwe + 1] = info[qwe];
                     info[qwe] = temp;
@@ -429,7 +430,7 @@ public class MainActivity extends AppCompatActivity {
             for (int s_c = 0; s_c < 6; s_c++) {
                 for (int qwe = f_c * 6; qwe < f_c * 6 + 6 - s_c - 1; qwe++) {
                     if (info[qwe][0] > info[qwe + 1][0]) {
-                        float[] temp = new float[3];
+                        float[] temp;
                         temp = info[qwe + 1];
                         info[qwe + 1] = info[qwe];
                         info[qwe] = temp;
@@ -493,11 +494,15 @@ public class MainActivity extends AppCompatActivity {
         x_matrix = temp.getArray();
     }
 
+
     // public void Reaction_part(Mat mat, double[][] x) {
 
     // }
 
     @Override
-    protected void onDestroy() { super.onDestroy();}
+    protected void onDestroy() {
+        super.onDestroy();
+    }
 }
+
 
